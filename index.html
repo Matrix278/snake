@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Static Template</title>
+    <link rel="stylesheet" href="snake.css" />
+  </head>
+  <body>
+    <h1>Snake</h1>
+    <!-- <div class="checkered"></div> -->
+    <canvas id="board" width="600" height="600" style="border:1px solid #000000;">
+    <script>
+        var canvas = document.getElementById("board");
+        var ctx = canvas.getContext("2d");
+        var c = 0;
+        const width = 600;
+        const height = 600;
+        const square = 20;
+        colors=Array("#6EA727","#528B1A");
+        for(i = 0; i < 30; i++){
+          for(j = 0; j < 30; j++){
+            ctx.fillStyle = colors[c];
+            ctx.fillRect(square*j, square*i, 20, 20);
+            c++;
+            if(c == 2){
+             c = 0;
+            }
+          }
+          ctx.fillStyle = colors[c];
+          ctx.fillRect(0, square * j, 20, 20);
+          c++;
+          if(c == 2){
+            c = 0;
+          }
+        }
+    </script>
+  </body>
+</html>
