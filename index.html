@@ -4,36 +4,130 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Static Template</title>
+    <title>Snake game</title>
     <link rel="stylesheet" href="snake.css" />
   </head>
   <body>
     <h1>Snake</h1>
-    <canvas id="board" width="600" height="600" style="border:1px solid #000000;">
+    <canvas id="board" width="600" height="600" style="border:1px solid #000000;"></canvas>
     <script>
         var canvas = document.getElementById("board");
         var ctx = canvas.getContext("2d");
-        var c = 0;
         const width = 600;
         const height = 600;
         const square = 20;
-        colors=Array("#6EA727","#528B1A");
-        for(i = 0; i < 30; i++){
-          for(j = 0; j < 30; j++){
-            ctx.fillStyle = colors[c];
-            ctx.fillRect(square*j, square*i, 20, 20);
-            c++;
-            if(c == 2){
-             c = 0;
+  /* ---------------------- GAME BOARD ---------------------------------- */
+        function gameBoard(){
+          var gameColorOrder = 0;
+          const colors = Array("#6EA727","#528B1A");
+          for(let i = 0; i < 30; i++){
+            for(j = 0; j < 30; j++){
+              ctx.fillStyle = colors[gameColorOrder];
+              ctx.fillRect(square*j, square*i, 20, 20);
+              gameColorOrder++;
+              if(gameColorOrder == 2){
+                gameColorOrder = 0;
+              }
+            }
+            ctx.fillStyle = colors[gameColorOrder];
+            ctx.fillRect(0, square * j, 20, 20);
+            gameColorOrder++;
+            if(gameColorOrder == 2){
+              gameColorOrder = 0;
             }
           }
-          ctx.fillStyle = colors[c];
-          ctx.fillRect(0, square * j, 20, 20);
-          c++;
-          if(c == 2){
-            c = 0;
+        }
+
+      /* ----------------------- SNAKE ------------------------- */
+
+        var snake = [{x: 120, y: 120},
+                     {x: 100, y: 120},
+                     {x: 80, y: 120}];
+        
+        function drawSnake(){
+          for(let i = 0; i < snake.length; i++){
+            ctx.fillStyle = "#545454";
+            ctx.fillRect(snake[i].x, snake[i].y, 20, 20);
           }
         }
+
+        /* ----------------- SNAKE MOVEMENT ---------------------- */
+
+        function snakeMovement(){
+          if(snake[0].x == 0 || snake[0].x == 580 || snake[0].y == 0 || snake[0].y == 580){
+            document.getElementById("gameOver").innerHTML = "GAME OVER!";
+            document.getElementById("gameOver").onclick =
+            function resetGame(){
+              snake = [{x: 120, y: 120},
+                      {x: 100, y: 120},
+                      {x: 80, y: 120}];
+              drawSnake();
+            };
+            clearCanvas();
+          }else{
+            for(let i = 0; i < snake.length; i++){
+              snake[i].x += 20;
+              clearCanvas();
+              gameBoard();
+              drawSnake();
+            }
+          }
+        }
+
+        function clearCanvas() {
+          canvas.width = canvas.width;
+        }
+
+        window.addEventListener("keydown", moveSnakeOnKeyDown, false);
+        // SNAKE HEAD x: 120, y: 120
+        // SNAKE GOES RIGHT x: 120+(N), y: 120
+        // SNAKE GOES LEFT x: 120-(N), y: 120
+        // SNAKE GOES UP x: 120, y: 120-(N)
+        // SNAKE GOES DOWN x: 120, y: 120+(N)
+        // 
+        // ГОЛОВА СТОИТ НА x: 120, y: 120, ДВИГАЕТСЯ ВНИЗ МЕНЯЕТ КООРДИНАТЫ Y НА 140, И ЧАСТЬ ТЕЛА ВСТАЕТ НА КООРДИНАТЫ ПРЕДИДУЩЕГО БЛОКА (ГОЛОВЫ)
+        //
+        function moveSnakeOnKeyDown(e) {
+            switch(e.keyCode) {
+                case 37: //Left <- 
+                    snake[0].x -= 20;
+                    break;
+                case 38: //Up
+                  snake[0].y -= 20;
+                  
+                    break;
+                case 39: //Right ->
+                    snake[0].x += 20;
+                    break;
+                case 40: //Down
+                    for(let i = 0; i < snake.length - 1; i++){
+                      if((i+1) != 3){
+                        var temp = snake[i+1].y; //БРАТЬ ДАННЫЕ ПРЕДЫДУЩЕГО БЛОКА 
+                        snake[i].y += 20;
+                        snake[i+1].y = temp; //ПЕРЕЗАПИСАТЬ СЛЕДУЮЩИЙ БЛОК ЗА ГОЛОВОЙ ЗМЕИ (ИНДЕКС В МАССИВЕ 1)
+                        console.log("SNAKE[HEAD]: " + snake[0].y);
+                        console.log("SNAKE[BODY 1]: " + snake[1].y);
+                        console.log("SNAKE[BODY 2]: " + snake[2].y);
+                      }
+                    }
+                    break;
+            }
+        }
+
+        function resetGame(){
+          snake = [{x: 120, y: 120},
+                  {x: 100, y: 120},
+                  {x: 80, y: 120}];
+          drawSnake();
+        }
+
+        gameBoard();
+        drawSnake();
+        setInterval(snakeMovement, 800);
     </script>
+    <div id="menu">
+      <span id="gameOver"></span>
+      <button id="resetGame" onclick="resetGame();">Restart game</button>
+    </div>
   </body>
 </html>
